@@ -146,3 +146,41 @@ then
 else
     echo "Visual Studio Code already installed."
 fi
+
+# Node 16
+if brew list -1 | grep -q "^node@16"
+then
+    echo "O Node.js 16.x já está instalado."
+else
+    echo "O Node.js 16.x não está instalado. Instalando o Node.js 16.x..."
+    brew install node@16
+fi
+
+# Angular CLI
+if ! command -v ng &> /dev/null
+then
+    echo "O Angular CLI não está instalado. Instalando o Angular CLI..."
+    npm install -g @angular/cli
+
+    # Verifica se a instalação foi bem-sucedida
+    if ! command -v ng &> /dev/null
+    then
+        echo "Erro: Falha ao instalar o Angular CLI."
+        exit
+    fi
+
+    echo "O Angular CLI foi instalado com sucesso."
+else
+    echo "O Angular CLI já está instalado."
+fi
+
+# Lighttpd
+if command -v lighttpd &> /dev/null
+then
+    echo "Lighttpd is already installed"
+else
+    # Install Lighttpd using Homebrew
+    echo "Installing Lighttpd using Homebrew"
+    brew install lighttpd
+fi
+

@@ -33,6 +33,10 @@ brew uninstall --cask postman
 echo "Uninstalling Visual Studio Code..."
 brew uninstall --cask visual-studio-code
 
+# Uninstall Node16
+echo "O Node.js 16.x está instalado. Removendo o Node.js 16.x..."
+brew uninstall node@16
+
 # Uninstall Homebrew
 echo "Uninstalling Homebrew..."
 /bin/bash -c "$(curl -fsSL 

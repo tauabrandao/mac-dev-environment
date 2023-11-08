@@ -1,5 +1,33 @@
 #!/bin/bash
 
+# Function to interrupt script execution if a key is pressed
+function interrupt_countdown() {
+    local counter=$1
+    printf "Starting in %s seconds. Press any key to cancel..." "$counter"
+    while [ $counter -gt 0 ]; do
+        read -s -n 1 -t 1 key
+        if [ $? -eq 0 ]; then
+            printf "\nInstallation canceled by the user.\n"
+            exit 1
+        fi
+        printf "\rStarting in %2d seconds. Press any key to cancel..." "$((--counter))"
+    done
+    printf "\nStarting installation...\n"
+}
+
+# List of software to be installed
+softwares=("Homebrew" "JDK 11" "JDK 16" "Maven 3.9" "Docker" "Minikube" "kubectl" "DBeaver" "Postman" "Visual Studio Code" "Node.js 16.x" "Angular CLI" "Lighttpd")
+
+# Informing the user about the installation
+echo "The following software will be installed if not already present on the system:"
+for software in "${softwares[@]}"; do
+    echo "- $software"
+done
+echo
+
+# Start the countdown
+interrupt_countdown 15
+
 # Check if Homebrew is installed
 if ! command -v brew &> /dev/null
 then
@@ -117,23 +145,27 @@ fi
 echo
 
 # DBeaver
-if ! command -v dbeaver &> /dev/null
+if [ -d "/Applications/DBeaver.app" ];
 then
+    echo "DBeaver already installed."
+else
     echo "DBeaver not found. Installing..."
     brew install --cask dbeaver-community
-else
-    echo "DBeaver already installed."
 fi
 
 echo
 
-# Postman
-if ! command -v postman &> /dev/null
-then
+# Check if Postman is installed via Homebrew and if the application directory exists
+if brew list --cask | grep -q 'postman' && [ -d "/Applications/Postman.app" ]; then
+    echo "Postman already installed."
+elif [ -d "/Applications/Postman.app" ]; then
+    # The application directory exists, but Homebrew doesn't have a record of it
+    echo "Postman is installed but not recognized by Homebrew. Relinking..."
+    brew link --overwrite postman
+else
+    # Postman is neither installed nor recognized by Homebrew
     echo "Postman not found. Installing..."
     brew install --cask postman
-else
-    echo "Postman already installed."
 fi
 
 echo
@@ -150,37 +182,36 @@ fi
 # Node 16
 if brew list -1 | grep -q "^node@16"
 then
-    echo "O Node.js 16.x já está instalado."
+    echo "Node.js 16.x is already installed."
 else
-    echo "O Node.js 16.x não está instalado. Instalando o Node.js 16.x..."
+    echo "Node.js 16.x is not installed. Installing Node.js 16.x..."
     brew install node@16
 fi
 
 # Angular CLI
 if ! command -v ng &> /dev/null
 then
-    echo "O Angular CLI não está instalado. Instalando o Angular CLI..."
+    echo "Angular CLI is not installed. Installing Angular CLI..."
     npm install -g @angular/cli
 
-    # Verifica se a instalação foi bem-sucedida
+    # Verify installation
     if ! command -v ng &> /dev/null
     then
-        echo "Erro: Falha ao instalar o Angular CLI."
+        echo "Error: Failed to install Angular CLI."
         exit
     fi
 
-    echo "O Angular CLI foi instalado com sucesso."
+    echo "Angular CLI installed successfully."
 else
-    echo "O Angular CLI já está instalado."
+    echo "Angular CLI is already installed."
 fi
 
 # Lighttpd
 if command -v lighttpd &> /dev/null
 then
-    echo "Lighttpd is already installed"
+    echo "Lighttpd is already installed."
 else
     # Install Lighttpd using Homebrew
-    echo "Installing Lighttpd using Homebrew"
+    echo "Installing Lighttpd using Homebrew..."
     brew install lighttpd
 fi
-
